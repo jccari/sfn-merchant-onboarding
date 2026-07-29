@@ -1,0 +1,13 @@
+[project]
+name = "sfn-merchant-onboarding"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.13.4",
+]
+
+[dependency-groups]
+dev = [
+    "moto>=5.2.2",
+    "pytest>=9.1.1",
+]

@@ -1,0 +1,31 @@
+services:
+  floci:
+    # Pinned to the exact verified version (see org.opencontainers.image.version).
+    # Avoid floating tags (latest/nightly): they silently diverge between
+    # machines and CI runs. Bump deliberately after checking release notes.
+    image: floci/floci:1.5.33-compat
+    container_name: floci
+    ports:
+      - "4566:4566"
+    volumes:
+      # Required: Floci runs Lambda/ECS/RDS workloads as real Docker
+      # containers on the host daemon (Docker-outside-of-Docker pattern).
+      # Without this mount, any container-backed service fails with
+      # SocketException on /var/run/docker.sock.
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root
+    environment:
+      # Makes URLs returned by Floci (e.g. SQS QueueUrl) resolve to this
+      # service name instead of localhost for sibling containers.
+      FLOCI_HOSTNAME: floci
+
+  floci-ui:
+    # Pinned version (see note on the floci service above).
+    image: floci/floci-ui:0.2.0
+    container_name: floci-ui
+    ports:
+      - "4500:4500"
+    environment:
+      FLOCI_ENDPOINT: http://floci:4566
+    depends_on:
+      - floci
